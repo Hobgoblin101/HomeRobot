@@ -8,7 +8,7 @@ for (let i=-24; i<=24; i++){
   world.set(-24, i, true);
 
   world.set(i, 24, true);
-  world.set(i, -24, true);
+  // world.set(i, -24, true);
 }
 
 //Coffe table

@@ -1,20 +1,13 @@
 function DistanceProb(location, rotation){
   var dist = 450; //max distance (cm)
 
+  var point = new Vector2(0,1);
+  point.rotation = rotation;
+
   var length = 450 / gridSize;
-  for (let i=-length; i<length; i++){
-    var x = 0;
-    var y = 0;
-    if (rotation.degrees % 180 === 0){
-      x = 0;
-      y = i;
-    }else if (rotation.degrees % 90 === 0){
-      x = i;
-      y = 0;
-    }else{
-      x = i;
-      y = x / Math.tan(rotation.radians);
-    }
+  for (let i=0; i<length; i++){
+    var x = Math.sin(rotation.radians) * i;
+    var y = Math.cos(rotation.radians) * i;
 
     var hit = world.get(
       x + (location.x/gridSize),
@@ -29,6 +22,5 @@ function DistanceProb(location, rotation){
     }
   }
 
-  dist += (Math.random()*3 - 1.5);
   return dist > 450 ? 450 : dist;
 }

@@ -5,7 +5,7 @@ class Robot{
 
     this.stepperMotor = {
       steps: 0,
-      maxSteps: 20,
+      maxSteps: 15,
       rotation: new Rotation(0)
     };
 
@@ -32,31 +32,26 @@ class Robot{
     translate(this.loc.x, this.loc.y);
     rotate(this.rotation.radians);
 
-    //Draw robot
-    ellipse(0, 0, 20, 20);
-    stroke(100);
-    line(0,0,0,10);
-
     for (let i=0; i<this.recentProbs.length; i++){
       if (!(this.recentProbs[i] instanceof Vector2)){
         continue;
       }
 
-      if (i===0){
-        fill(0,255,0);
-      }else{
-        fill(0,0,255);
-      }
+      stroke(255-i, 0,0);
 
-      stroke(255,0,0);
       line(0,0, this.recentProbs[i].x, this.recentProbs[i].y);
       noStroke();
-      ellipse(this.recentProbs[i].x, this.recentProbs[i].y, 10, 10);
-
-      console.log('drew prob at', this.recentProbs[i].x, this.recentProbs[i].y);
+      // ellipse(this.recentProbs[i].x, this.recentProbs[i].y, 10, 10);
     }
 
+    //Draw robot
+    ellipse(0, 0, 20, 20);
+    stroke(100);
+    line(0,0,0,10);
+
     pop();
+
+    // this.move(0.01);
   }
 
   move(dist){
@@ -72,7 +67,8 @@ class Robot{
 var robot = new Robot();
 
 setTimeout(function(){
-  //speedOfSound 340.29 m/s
+  //speedOfSound 340.29   m/s
+  //             34029000 cm/ms
 
   function UltraSonicLoop(){
     var dist = DistanceProb(robot.loc, robot.stepperMotor.rotation);
@@ -80,7 +76,7 @@ setTimeout(function(){
     setTimeout(function () {
       robot.update(dist);
       UltraSonicLoop();
-    }, (dist*2 / 340.29)*1000); //Distance = Speed Of Sound * Time Taken / 2
+    }, (dist*2 / 34029000)); //Distance = Speed Of Sound * Time Taken / 2
   }
 
   UltraSonicLoop();
