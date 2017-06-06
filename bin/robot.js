@@ -36,8 +36,8 @@ class Robot{
       );
 
       if (p > best.p){
-        best.x = x;
-        best.y = y;
+        best.x = x + (self.offset.x/gridSize);
+        best.y = y + (self.offset.y/gridSize);
         best.p = p;
         best.n = 1;
       }else if (best.p !== 0 && best.p === p){
@@ -68,13 +68,8 @@ class Robot{
 
     self.hits.forEach(function(value, x, y){
       total += 1;
-      var t = self.memory.get(x + offx, y + offy);
-      if (t !== undefined){
-        if (t == value){
-          correct += 1;
-        }else{
-          correct -= 1;
-        }
+      if (self.memory.get(x + offx, y + offy) === value){
+        correct += 1;
       }
     });
 
