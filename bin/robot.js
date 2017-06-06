@@ -34,6 +34,7 @@ class Robot{
         x + (self.offset.x/gridSize),
         y + (self.offset.y/gridSize)
       );
+
       if (p > best.p){
         best.x = x;
         best.y = y;
@@ -72,7 +73,7 @@ class Robot{
         if (t == value){
           correct += 1;
         }else{
-          // correct -= 1;
+          correct -= 1;
         }
       }
     });
