@@ -32,8 +32,16 @@ class Robot{
 
     var offx = self.offset.x / gridSize;
     var offy = self.offset.y / gridSize;
+    var sr = Math.max(
+      Math.max(
+        Math.abs(this.memory.minX), Math.abs(this.memory.maxX)
+      ),
+      Math.max(
+        Math.abs(this.memory.minY), Math.abs(this.memory.maxY)
+      )
+    );
 
-    SpiralLoop(9, function(x, y){
+    SpiralLoop(sr, function(x, y){
       var cordinateX = x + offx;
       var cordinateY = y + offy;
 
@@ -49,6 +57,14 @@ class Robot{
         best.x = (best.x*best.n) + ( cordinateX *(best.n+1) );
         best.y = (best.y*best.n) + ( cordinateY *(best.n+1) );
         best.n += 1;
+      }
+
+      //Break down after distances so that the robot will pick the best option, but after it has done allot of calculation it slowly becomes less and less nit picky until it gives up
+      var radius = Math.max(Math.abs(x), Math.abs(y));
+      if (radius > 3){
+        if (1-((radius-3)/30) < best.p){
+          return false;
+        }
       }
     });
 
@@ -73,6 +89,10 @@ class Robot{
       if ((self.memory.get(x + cordX, y + cordY) === true) === (value === true)){
         correct += 1;
       }
+      // var test = self.memory.get(x + cordX, y + cordY);
+      // if (test !== undefined && test != value){
+      //   wrong += 1;
+      // }
       total += 1;
     });
 

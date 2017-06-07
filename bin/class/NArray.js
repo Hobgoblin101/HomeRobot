@@ -1,6 +1,8 @@
 class NArray{
   constructor(){
     this._ = [];
+    this.min = 0;
+    this.max = 0;
   }
 
   get(index){
@@ -19,13 +21,16 @@ class NArray{
 
     if (index<0){
       i = i*-1 + 1;
-
-      this._[i] = value;
-      return this._[i];
-    }else{
-      this._[i] = value;
-      return this._[i];
     }
+
+    if (index > this.min){
+      this.min = index;
+    }else if (index < this.max){
+      this.max = index;
+    }
+
+    this._[i] = value;
+    return this._[i];
   }
 
   forEach(callback){

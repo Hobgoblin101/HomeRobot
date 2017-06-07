@@ -8,7 +8,11 @@ function SpiralLoop(searchSize, callback){
 
   for (let i=0; i<range; i++){
     if ((-searchSize/2 < x && x < searchSize/2) && (-searchSize/2 < y && y < searchSize/2)){
-      callback(x, y);
+      var res = callback(x, y);
+
+      if (res === false){
+        return;
+      }
     }
     if (x === y || (x < 0 && x == -y) || (x > 0 && x == 1-y)){
       var t = dx; //Temp
