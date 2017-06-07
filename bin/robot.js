@@ -5,6 +5,7 @@ class Robot{
     this.rotation = new Rotation();
 
     this.offset = new Vector2();
+    this.confedence = 1;
 
     //Lay of the land knowledge
     this.hits = new NArray2D();
@@ -13,7 +14,7 @@ class Robot{
     //Recorded stepperMotor position
     this.stepperMotor = {
       steps: 0,
-      maxSteps: 360,
+      maxSteps: 45, // Min 16
       rotation: new Rotation(0)
     };
 
@@ -29,30 +30,32 @@ class Robot{
       n: 1 //Number of equal bests
     };
 
+    var offx = self.offset.x / gridSize;
+    var offy = self.offset.y / gridSize;
+
     SpiralLoop(9, function(x, y){
-      var p = self.matchGridOffset(
-        x + (self.offset.x/gridSize),
-        y + (self.offset.y/gridSize)
-      );
+      var cordinateX = x + offx;
+      var cordinateY = y + offy;
+
+      var p = self.matchGridOffset(cordinateX, cordinateY);
 
       if (p > best.p){
-        best.x = x + (self.offset.x/gridSize);
-        best.y = y + (self.offset.y/gridSize);
+        best.x = cordinateX;
+        best.y = cordinateY;
         best.p = p;
         best.n = 1;
       }else if (best.p !== 0 && best.p === p){
         //If equal best, add to the average
-        best.x = best.x*best.n + x *(best.n+1);
-        best.y = best.y*best.n + y *(best.n+1);
+        best.x = (best.x*best.n) + ( cordinateX *(best.n+1) );
+        best.y = (best.y*best.n) + ( cordinateY *(best.n+1) );
         best.n += 1;
       }
     });
 
-    console.log(best);
-
     if (best.p >= 0.25){
       this.offset.x = best.x * gridSize;
       this.offset.y = best.y * gridSize;
+      this.confedence = best.p;
 
       return best.p;
     }
@@ -60,23 +63,29 @@ class Robot{
     return best.p;
   }
 
-  matchGridOffset(offx, offy){
+  matchGridOffset(cordX, cordY){
     var total = 0;
     var correct = 0;
 
     var self = this;
 
     self.hits.forEach(function(value, x, y){
-      total += 1;
-      if (self.memory.get(x + offx, y + offy) === value){
+      if ((self.memory.get(x + cordX, y + cordY) === true) === (value === true)){
         correct += 1;
       }
+      total += 1;
     });
 
     return correct / total;
   }
 
   update(probDist){
+    if (Math.abs(this.offset.x) === Infinity || Math.abs(this.offset.y) === Infinity){
+      this.offset.x = 0;
+      this.offset.y = 0;
+      this.confedence = 0;
+    }
+
     var self = this;
 
     //Add distance

@@ -6,8 +6,8 @@ function DistanceProb(location, rotation){
 
   var length = 450 / gridSize;
   for (let i=0; i<length; i++){
-    var x = Math.sin(rotation.radians) * i;
-    var y = Math.cos(rotation.radians) * i;
+    var x = Math.sin(rotation.radians) * i + (Math.random()*0.3 - 0.15);
+    var y = Math.cos(rotation.radians) * i + (Math.random()*0.3 - 0.15);
 
     var hit = world.get(
       x + (location.x/gridSize),
