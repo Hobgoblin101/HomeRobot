@@ -5,20 +5,44 @@ class Robot{
     this.rotation = new Rotation();
 
     this.offset = new Vector2();
-    this.confedence = 1;
+    this.confedence = 0;
 
     //Lay of the land knowledge
     this.hits = new NArray2D();
     this.memory = new NArray2D();
+    this.learning = true;
 
     //Recorded stepperMotor position
     this.stepperMotor = {
       steps: 0,
-      maxSteps: 45, // Min 16
+      maxSteps: 360, // Min 16
       rotation: new Rotation(0)
     };
 
     this.recentProbs = [];
+  }
+
+  memorize(){
+    console.log('learning...');
+
+    for (let item of this.recentProbs){
+      var rot = item.rotation.radians;
+      var magnitude = Math.floor(item.magnitude);
+
+      // console.log('setting...', rot, magitude);
+
+      for (let i=0; i<magnitude; i++){
+        var x = (this.offset.x + Math.sin(rot)*i) / gridSize;
+        var y = (this.offset.y + Math.cos(rot)*i) / gridSize;
+
+        this.memory.set(x, y, false);
+      }
+      this.memory.set(
+        (item.x+this.offset.x) / gridSize,
+        (item.y+this.offset.y) / gridSize,
+        true
+      );
+    }
   }
 
   calculateOffset(){
@@ -69,19 +93,21 @@ class Robot{
     });
 
     if (best.p >= 0.25){
-      this.offset.x = best.x * gridSize;
-      this.offset.y = best.y * gridSize;
-      this.confedence = best.p;
-
-      return best.p;
+      if (best.x === Infinity || best.y === Infinity){
+        this.confedence = 0;
+      }else{
+        this.offset.x = best.x * gridSize;
+        this.offset.y = best.y * gridSize;
+        this.confedence = best.p;
+      }
     }
 
     return best.p;
   }
-
   matchGridOffset(cordX, cordY){
     var total = 0;
     var correct = 0;
+    // var wrong = 0;
 
     var self = this;
 
@@ -89,14 +115,10 @@ class Robot{
       if ((self.memory.get(x + cordX, y + cordY) === true) === (value === true)){
         correct += 1;
       }
-      // var test = self.memory.get(x + cordX, y + cordY);
-      // if (test !== undefined && test != value){
-      //   wrong += 1;
-      // }
       total += 1;
     });
 
-    return correct / total;
+    return (correct / total);
   }
 
   update(probDist){
@@ -122,9 +144,12 @@ class Robot{
     if (this.stepperMotor.steps === 0){
       this.calculateOffset();
 
+      if (this.learning && (this.confedence > 0.9 || this.confedence === 0)){
+        this.memorize();
+      }
+
       this.hits.forEach(function(value, x, y){
         self.hits.set(x, y, false);
-        // value = false;
       });
       for (let item of this.recentProbs){
         this.hits.set(item.x/gridSize, item.y/gridSize, true);
@@ -145,7 +170,7 @@ class Robot{
 
       stroke(255*(1-i/this.recentProbs.length), 0,0);
 
-      line(0,0, this.recentProbs[i].x, this.recentProbs[i].y);
+      // line(0,0, this.recentProbs[i].x, this.recentProbs[i].y);
       noStroke();
     }
 
@@ -209,7 +234,7 @@ setTimeout(function(){
   //speedOfSound 340.29   m/s
   //             34029000 cm/ms
 
-  robot.memory = world;
+  // robot.memory = world;
 
   function UltraSonicLoop(){
     var dist = DistanceProb(robot.loc, robot.stepperMotor.rotation);
