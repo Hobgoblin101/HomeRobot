@@ -65,8 +65,3 @@ class Vector2{
     this.y = vector.y * mag;
   }
 }
-
-var test = new Vector2(0, 10);
-console.log('rot', test.rotation);
-test.rotation = new Rotation(90);
-console.log(test);
