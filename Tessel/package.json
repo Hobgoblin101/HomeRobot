@@ -1,7 +1,7 @@
 {
-  "name": "Tessel",
-  "version": "0.0.0",
-  "description": "Tessel project",
+  "name": "HomeRobot",
+  "version": "0.0.1",
+  "description": "A robot to find it's location in the home",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

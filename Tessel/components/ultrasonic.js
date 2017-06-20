@@ -1,3 +1,5 @@
+var Vector2 = require('.././class/vector2.js');
+
 module.exports = {
   last: 0,
   real: {
@@ -10,15 +12,15 @@ module.exports.probe = function(callback){
   var start = Date.now();
 
   var r = this.real.radians;
-  var offx = this.real.loc.x / gridSize;
-  var offy = this.real.loc.y / gridSize;
+  var offx = this.real.loc.x / global.gridSize;
+  var offy = this.real.loc.y / global.gridSize;
 
 
   var point = new Vector2(0,1);
   point.rotation = r;
 
   var dist;
-  var length = 450 / gridSize;
+  var length = 450 / global.gridSize;
 
   for (let i=0; i<length; i++){
     var x = Math.sin(r) * i;
@@ -30,7 +32,7 @@ module.exports.probe = function(callback){
     );
 
     if (hit){
-      dist = Math.sqrt(x*x + y*y) * gridSize;
+      dist = Math.sqrt(x*x + y*y) * global.gridSize;
       break;
     }
   }

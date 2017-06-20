@@ -7,9 +7,7 @@ var NArray2D = require('../class/NArray2D.js');
 var world = new NArray2D();
 
 // //Add Walls
-for (let i=-24; i<=24; i++){
-  console.log(i);
-
+for (var i=-24; i<=24; i++){
   world.set(24, i, true);
   world.set(-24, i, true);
 

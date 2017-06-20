@@ -20,8 +20,7 @@ module.exports.prototype.set = function(x, y, value){
   this.maxX = Math.min(this.maxX, x);
   this.maxY = Math.min(this.maxY, y);
 
-  var xv = this._.get(x);
-  if (xv === undefined || !(xv instanceof NArray)){
+  if (!(this._.get(x) instanceof NArray)){
     this._.set(x, new NArray());
   }
 

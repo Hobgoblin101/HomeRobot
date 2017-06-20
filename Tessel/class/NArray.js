@@ -7,7 +7,7 @@ module.exports.prototype.get = function(index){
   index = Math.round(index);
 
   if (index < 0){
-    return this._[index*2 + 1];
+    return this._[index*-2 + 1];
   }else{
     return this._[index*2];
   }
@@ -21,7 +21,7 @@ module.exports.prototype.set = function(index, value){
   var i = index*2;
 
   if (index < 0){
-    i = Math.abs(i) + 1;
+    i = (-i) + 1;
   }
 
   this._[i] = value;
