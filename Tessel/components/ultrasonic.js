@@ -11,7 +11,7 @@ module.exports = {
 module.exports.probe = function(callback){
   var start = Date.now();
 
-  var r = this.real.radians;
+  var r = this.real.rot;
   var offx = this.real.loc.x / global.gridSize;
   var offy = this.real.loc.y / global.gridSize;
 
@@ -22,7 +22,7 @@ module.exports.probe = function(callback){
   var dist;
   var length = 450 / global.gridSize;
 
-  for (let i=0; i<length; i++){
+  for (var i=0; i<length; i++){
     var x = Math.sin(r) * i;
     var y = Math.cos(r) * i;
 
@@ -38,8 +38,6 @@ module.exports.probe = function(callback){
   }
 
   if (!dist){
-    console.error('Invalid distance', dist);
-
     dist = 450;
   }
 

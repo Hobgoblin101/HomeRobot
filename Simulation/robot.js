@@ -7,6 +7,12 @@ class Robot{
     this.offset = new Vector2();
     this.confedence = 0;
 
+    this.autoCal = {
+      position: false,
+      rotation: true
+    };
+    this.rotationDetail = 10;
+
     //Lay of the land knowledge
     this.hits = new NArray2D();
     this.memory = new NArray2D();
@@ -28,8 +34,6 @@ class Robot{
     for (let item of this.recentProbes){
       var rot = item.rotation.radians;
       var magnitude = Math.floor(item.magnitude);
-
-      // console.log('setting...', rot, magitude);
 
       for (let i=0; i<magnitude; i++){
         var x = (this.offset.x + Math.sin(rot)*i) / gridSize;
@@ -121,8 +125,60 @@ class Robot{
     return (correct / total);
   }
 
+  calculateRotation(){
+    var best = {
+      r: 0,                                                           //Rotation
+      p: 0                                                    //Matching Percent
+    };
+
+    var sr = Math.max(                         //Search radius
+      Math.max(
+        Math.abs(this.memory.minX), Math.abs(this.memory.maxX)
+      ),
+      Math.max(
+        Math.abs(this.memory.minY), Math.abs(this.memory.maxY)
+      )
+    );
+
+    for (let i=0; i<this.rotationDetail; i++){
+      var r = i * (Math.PI*2 / this.rotationDetail);
+
+      var p = this.matchGridRotation(r);
+    }
+
+    // best.r = Math.round((best.r / this.rotationDetail)) * this.rotationDetail;
+
+    console.log(best.r, p);
+  }
+  matchGridRotation(radians){
+    var offx = this.offset.x / gridSize;
+    var offy = this.offset.y / gridSize;
+
+    var total = 0;
+    var correct = 0;
+
+    var self = this;
+
+    self.hits.forEach(function(value, x, y){
+      var mag = Math.sqrt(x*x + y*y);
+
+      //Rotated x,y value
+      var rx = radians === 0 || radians === Math.PI || radians === Math.PI*2 ? 0 : Math.sin(radians) * mag;
+      var ry = radians === Math.PI/2 || radians === Math.PI*1.5 ? 0 : Math.cos(radians) * mag;
+
+      if ((self.memory.get(rx + offx, ry + offy) === true) === (value === true)){
+        correct += 1;
+      }
+      total += 1;
+    });
+
+    return (correct / total);
+  }
+
   update(){
     var self = this;
+
+    sensor.real.rot.degrees = robot.stepperMotor.rotation.degrees + this.rotation.degrees;
 
     sensor.probe(function(probeDist){
       //Add distance
@@ -137,7 +193,13 @@ class Robot{
       self.stepperMotor.rotation.degrees = 360 * (self.stepperMotor.steps / self.stepperMotor.maxSteps);
 
       if (self.stepperMotor.steps === 0){
-        self.calculateOffset();
+        if (self.autoCal.position){
+          self.calculateOffset();
+        }
+
+        if (self.autoCal.rotation){
+          self.calculateRotation();
+        }
 
         if (self.learning && (self.confedence > 0.9 || self.confedence === 0)){
           self.memorize();
@@ -227,6 +289,8 @@ class Robot{
 var sensor = new Ultrasonic();
 var robot = new Robot();
 sensor.real.loc = robot.loc;
-sensor.real.rot = robot.stepperMotor.rotation;
+// sensor.real.rot = robot.stepperMotor.rotation;
+
+robot.memory = world;
 
 robot.update();

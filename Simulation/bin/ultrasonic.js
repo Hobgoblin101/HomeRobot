@@ -40,8 +40,6 @@ class Ultrasonic{
     }
 
     if (!dist){
-      console.error('Invalid distance', dist);
-
       dist = 450;
     }
 

@@ -28,7 +28,7 @@ module.exports.prototype.set = function(index, value){
   return this._[i];
 };
 module.exports.prototype.forEach = function(callback){
-  for (let i=0; i<this._.length; i++){
+  for (var i=0; i<this._.length; i++){
     if (this._[i] === undefined){
       continue;
     }
