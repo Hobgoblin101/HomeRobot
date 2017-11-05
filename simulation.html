@@ -1,0 +1,125 @@
+<html>
+  <head>
+    <script>
+      var gridsize = 1;
+      var pixelToCm = 10;
+    </script>
+    <script src="./lib/NArray.js"></script>
+    <script src="./lib/vector.js"></script>
+    <script src="./bin/grid-match.js"></script>
+    <script>
+      var world = new NArray2D();
+      for (let i=0; i<100; i++){
+        world.set(
+          Math.random()*100 - 50,
+          Math.random()*100 - 50,
+          true
+        );
+      }
+    </script>
+    <script src="./bin/physical.js"></script>
+    <script src="./brain.js"></script>
+  </head>
+  <body style="margin: 0px;">
+    <script>
+      var canvas = document.createElement('canvas');
+      canvas.width = 1000;
+      canvas.height = 1000;
+      document.body.appendChild(canvas);
+      var ctx = canvas.getContext('2d');
+
+      function draw(){
+        //Background
+        ctx.fillStyle = "rgb(15, 15, 15)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.stroke();
+        ctx.strokeStyle = null;
+
+        ctx.translate(canvas.width/2, canvas.height/2);
+
+        //Robot Memory
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = 'red';
+        ctx.shadowColor = "red";
+        ctx.shadowBlur = 15;
+        robot.mapping.lastScanned.forEach(function(x, y, value){
+          if (value == true){
+            ctx.fillRect(
+              (x+physical.location.x)*gridsize*pixelToCm,
+              (y+physical.location.y)*gridsize*pixelToCm,
+              (gridsize*pixelToCm),
+              (gridsize*pixelToCm),
+            );
+            ctx.stroke();
+          }
+        });
+        ctx.beginPath();
+        ctx.ellipse(
+          robot.location.est.x*gridsize*pixelToCm,
+          robot.location.est.y*gridsize*pixelToCm, 
+          10, 10, 45 * Math.PI/180, 0, 2 * Math.PI
+        );
+        ctx.stroke();
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = 'blue';
+        ctx.shadowColor = "blue";
+        ctx.shadowBlur = 15;
+        robot.mapping.known.forEach(function(x, y, value){
+          if (value == true){
+            ctx.fillRect(
+              (x)*gridsize*pixelToCm,
+              (y)*gridsize*pixelToCm,
+              (gridsize*pixelToCm),
+              (gridsize*pixelToCm),
+            );
+            ctx.stroke();
+          }
+        });
+        ctx.beginPath();
+        ctx.ellipse(
+          robot.location.known.x*gridsize*pixelToCm,
+          robot.location.known.y*gridsize*pixelToCm, 
+          10, 10, 45 * Math.PI/180, 0, 2 * Math.PI
+        );
+        ctx.stroke();
+        ctx.fill();
+        ctx.shadowColor = "transparent";
+        ctx.shadowBlur = 0;
+
+        //Draw world
+        ctx.globalAlpha = 0.7;
+        ctx.fillStyle = 'white';
+        world.forEach(function(x, y, value){
+          if (value == true){
+            ctx.fillRect(
+              x*gridsize*pixelToCm,
+              y*gridsize*pixelToCm,
+              (gridsize*pixelToCm),
+              (gridsize*pixelToCm),
+            );
+            ctx.stroke();
+          }
+        });
+
+        //Draw the robot it's self
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.ellipse(
+          physical.location.x*gridsize*pixelToCm,
+          physical.location.y*gridsize*pixelToCm, 
+          10, 10, 45 * Math.PI/180, 0, 2 * Math.PI
+        );
+        ctx.stroke();
+        ctx.fill();
+
+        ctx.translate(-canvas.width/2, -canvas.height/2);
+
+        ctx.fillText('Confidence: '+(robot.confidence*100).toFixed(0),5,15);
+      }
+
+      draw();
+    </script>
+  </body>
+</html>
