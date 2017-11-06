@@ -51,7 +51,7 @@ var robot = {
     draw(); //FOR SIMULATION PURPOSES ONLY
   },
   predict: function(){
-    if (robot.fistScan){
+    if (robot.firstScan){
       robot.mapping.scanned.forEach(function(x, y, value){
         if (value == true){
           robot.fistScan = false;
