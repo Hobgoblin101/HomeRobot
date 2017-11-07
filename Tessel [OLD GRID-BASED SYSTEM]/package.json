@@ -1,0 +1,15 @@
+{
+  "name": "HomeRobot",
+  "version": "0.0.1",
+  "description": "A robot to find it's location in the home",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "www.github.com/tessel/t2-cli",
+  "keywords": [
+    "Tessel"
+  ],
+  "license": "MIT",
+  "readme": "A bare bones Tessel 2 blinky script."
+}
