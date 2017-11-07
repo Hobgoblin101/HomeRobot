@@ -23,17 +23,22 @@ var robot = {
   loop: function(){
     robot.inLoop = true;
 
-    physical.rotateProbe(Math.PI/10, function(dist){
-      robot.probeRot += Math.PI/10;
+    physical.rotateProbe(Math.PI/20, function(dist){
+      robot.probeRot += Math.PI/20;
 
       physical.probe(function(dist){
         //Fail probe
-        if (dist == null)  {
+        if (isNaN(dist))  {
           robot.inLoop = false;
           return;
         }
         var x = Math.trunc((Math.cos(robot.probeRot) * dist) / gridsize);
         var y = Math.trunc((Math.sin(robot.probeRot) * dist) / gridsize);
+
+        if (x == 0 || y == 0){
+          robot.inLoop = false;
+          return;
+        }
 
         robot.mapping.scanned.push(new Vector2(x, y));
 
@@ -62,22 +67,66 @@ var robot = {
       return;
     }
 
+
+
+
     //Detect average point offset
-    var xoff = 0;
-    var yoff = 0;
+    var avgOffx = 0;                                  //Average offset
+    var avgOffy = 0;
+    var offs = [];                             //List of offset values
     for (let i=0; i<robot.mapping.lastScanned.length; i++){
-      var t = NearestPoint(robot.mapping.known, robot.mapping.lastScanned[i]);
-      xoff += t.x;
-      yoff += t.y;
+      var px = robot.mapping.lastScanned[i].x + robot.location.known.x;
+      var py = robot.mapping.lastScanned[i].y + robot.location.known.y;
+
+      var t = NearestPoint(robot.mapping.known, {x: px, y: py});
+      avgOffx += (t.x - px); //Add error
+      avgOffy += (t.y - py);
+      offs.push({
+        x: (t.x - px),
+        y: (t.y - py)
+      });
     }
-    xoff /= robot.mapping.lastScanned.length;
-    yoff /= robot.mapping.lastScanned.length;
+    avgOffx /= robot.mapping.lastScanned.length;
+    avgOffy /= robot.mapping.lastScanned.length;
 
-    console.log(xoff, yoff);
+    //Remove possible new points from the average
+    var dOffx;                                          //Delta offset
+    var dOffy;
+    var offx = 0;                            //Relevent average offset
+    var offy = 0;
+    var offTally = 0;
+    for (let i=0; i<offs.length; i++){
+      dOffx = offs[i].x - avgOffx;
+      dOffy = offs[i].y - avgOffy;
 
-    // console.log(NearestPoint(robot.mapping.known, robot.mapping.known[0]));
+      // console.log(offs[i], avgOffx, avgOffy);
+      
+
+      if (Math.abs(dOffx) > 20){
+        continue;
+      }else if (Math.abs(dOffy) > 20){
+        continue;
+      }
+
+      offx += offs[i].x;
+      offy += offs[i].y;
+      offTally += 1;
+    }
+    offx /= offTally;
+    offy /= offTally;
+
+    robot.location.known.x += Math.max(-10, Math.min(10, offx));
+    robot.location.known.y += Math.max(-10, Math.min(10, offy));
   }
 }
+
+//Let the AI start knowing the interworld
+robot.firstScan = false;
+world.forEach(function(x, y, value){
+  if (value === true){
+    robot.mapping.known.push(new Vector2(x, y));
+  }
+});
 
 setInterval(function(){
   if (!robot.inLoop){

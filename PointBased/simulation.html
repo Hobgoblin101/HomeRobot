@@ -8,10 +8,10 @@
     <script src="./lib/vector.js"></script>
     <script>
       var world = new NArray2D();
-      for (let i=0; i<100; i++){
+      for (let i=0; i<10; i++){
         world.set(
-          Math.random()*100 - 50,
-          Math.random()*100 - 50,
+          Math.random()*50 - 25,
+          Math.random()*50 - 25,
           true
         );
       }
@@ -51,31 +51,20 @@
           );
           ctx.stroke();
         }
-        //Draw location estimate
-        ctx.beginPath();
-        ctx.ellipse(
-          robot.location.est.x*gridsize*pixelToCm,
-          robot.location.est.y*gridsize*pixelToCm, 
-          10, 10, 45 * Math.PI/180, 0, 2 * Math.PI
-        );
-        ctx.stroke();
-        ctx.fill();
         //Draw known points
         ctx.globalAlpha = 1;
         ctx.fillStyle = 'blue';
         ctx.shadowColor = "blue";
         ctx.shadowBlur = 15;
-        // robot.mapping.known.forEach(function(x, y, value){
-        //   if (value == true){
-        //     ctx.fillRect(
-        //       (x)*gridsize*pixelToCm,
-        //       (y)*gridsize*pixelToCm,
-        //       (gridsize*pixelToCm),
-        //       (gridsize*pixelToCm),
-        //     );
-        //     ctx.stroke();
-        //   }
-        // });
+        for (let i=0; i<robot.mapping.known.length; i++){
+          ctx.fillRect(
+            (robot.mapping.known[i].x)*gridsize*pixelToCm,
+            (robot.mapping.known[i].y)*gridsize*pixelToCm,
+            gridsize*pixelToCm,
+            gridsize*pixelToCm
+          );
+          ctx.stroke();
+        }
         //Draw last know location
         ctx.beginPath();
         ctx.ellipse(
